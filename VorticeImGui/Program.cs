@@ -183,12 +183,12 @@ namespace VorticeImGui
             if (imguiInputHandler?.ProcessMessage(hWnd, (WindowMessage)msg, wParam, lParam) ?? false)
                 return IntPtr.Zero;
 
-            //switch ((WindowMessage)msg)
-            //{
-            //    case WindowMessage.Destroy:
-            //        PostQuitMessage(0);
-            //        break;
-            //}
+            switch ((WindowMessage)msg)
+            {
+                case WindowMessage.Destroy:
+                    PostQuitMessage(0);
+                    break;
+            }
 
             return DefWindowProc(hWnd, msg, wParam, lParam);
         }
