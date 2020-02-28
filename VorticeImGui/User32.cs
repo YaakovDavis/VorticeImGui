@@ -1260,4 +1260,10 @@ namespace Vortice.Win32
         ///</summary>
         OEM_CLEAR = 0xFE
     }
+
+    public static class Utils
+    {
+        public static int Loword(int number) => number & 0x0000FFFF;
+        public static int Hiword(int number) => number >> 16;
+    }
 }

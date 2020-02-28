@@ -181,7 +181,7 @@ namespace VorticeImGui
                     io.AddInputCharacter((uint)wParam);
                     return false;
                 case WindowMessage.SetCursor:
-                    if (Loword((int)(long)lParam) == 1 && UpdateMouseCursor())
+                    if (Utils.Loword((int)(long)lParam) == 1 && UpdateMouseCursor())
                         return true;
                     return false;
             }
@@ -189,11 +189,8 @@ namespace VorticeImGui
         }
 
         static int WHEEL_DELTA = 120;
-        static int GET_WHEEL_DELTA_WPARAM(UIntPtr wParam) => HiWord((int)(uint)wParam);
-        static int GET_XBUTTON_WPARAM(UIntPtr wParam) => HiWord((int)(uint)wParam);
-
-        static int Loword(int number) => number & 0x0000FFFF;
-        static int HiWord(int number) => number & unchecked((int)0xFFFF0000);
+        static int GET_WHEEL_DELTA_WPARAM(UIntPtr wParam) => Utils.Hiword((int)wParam);
+        static int GET_XBUTTON_WPARAM(UIntPtr wParam) => Utils.Hiword((int)wParam);
 
     }
 }
