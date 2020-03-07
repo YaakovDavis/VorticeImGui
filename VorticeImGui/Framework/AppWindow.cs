@@ -15,11 +15,12 @@ namespace VorticeImGui
     class AppWindow
     {
         public Win32Window Win32Window;
-        public ID3D11Device Device;
-        public ID3D11DeviceContext DeviceContext;
-        public IDXGISwapChain SwapChain;
-        public ID3D11Texture2D BackBuffer;
-        public ID3D11RenderTargetView RenderView;
+
+        ID3D11Device device;
+        ID3D11DeviceContext deviceContext;
+        IDXGISwapChain swapChain;
+        ID3D11Texture2D backBuffer;
+        ID3D11RenderTargetView renderView;
 
         Format format = Format.R8G8B8A8_UNorm;
 
@@ -33,13 +34,13 @@ namespace VorticeImGui
         public AppWindow(Win32Window win32window, ID3D11Device device, ID3D11DeviceContext deviceContext)
         {
             Win32Window = win32window;
-            Device = device;
-            DeviceContext = deviceContext;
+            this.device = device;
+            this.deviceContext = deviceContext;
 
             imGuiContext = ImGui.CreateContext();
             ImGui.SetCurrentContext(imGuiContext);
 
-            imGuiRenderer = new ImGuiRenderer(Device, DeviceContext);
+            imGuiRenderer = new ImGuiRenderer(this.device, this.deviceContext);
             imguiInputHandler = new ImGuiInputHandler(Win32Window.Handle);
 
             ImGui.GetIO().DisplaySize = new Vector2(Win32Window.Width, Win32Window.Height);
@@ -91,9 +92,9 @@ namespace VorticeImGui
 
         void resize()
         {
-            if (RenderView == null)//first show
+            if (renderView == null)//first show
             {
-                var dxgiFactory = Device.QueryInterface<IDXGIDevice>().GetParent<IDXGIAdapter>().GetParent<IDXGIFactory>();
+                var dxgiFactory = device.QueryInterface<IDXGIDevice>().GetParent<IDXGIAdapter>().GetParent<IDXGIFactory>();
 
                 var swapchainDesc = new SwapChainDescription()
                 {
@@ -106,21 +107,21 @@ namespace VorticeImGui
                     Usage = Vortice.DXGI.Usage.RenderTargetOutput
                 };
 
-                SwapChain = dxgiFactory.CreateSwapChain(Device, swapchainDesc);
+                swapChain = dxgiFactory.CreateSwapChain(device, swapchainDesc);
                 dxgiFactory.MakeWindowAssociation(Win32Window.Handle, WindowAssociationFlags.IgnoreAll);
 
-                BackBuffer = SwapChain.GetBuffer<ID3D11Texture2D>(0);
-                RenderView = Device.CreateRenderTargetView(BackBuffer);
+                backBuffer = swapChain.GetBuffer<ID3D11Texture2D>(0);
+                renderView = device.CreateRenderTargetView(backBuffer);
             }
             else
             {
-                RenderView.Dispose();
-                BackBuffer.Dispose();
+                renderView.Dispose();
+                backBuffer.Dispose();
 
-                SwapChain.ResizeBuffers(1, Win32Window.Width, Win32Window.Height, format, SwapChainFlags.None);
+                swapChain.ResizeBuffers(1, Win32Window.Width, Win32Window.Height, format, SwapChainFlags.None);
 
-                BackBuffer = SwapChain.GetBuffer<ID3D11Texture2D1>(0);
-                RenderView = Device.CreateRenderTargetView(BackBuffer);
+                backBuffer = swapChain.GetBuffer<ID3D11Texture2D1>(0);
+                renderView = device.CreateRenderTargetView(backBuffer);
             }
         }
 
@@ -143,15 +144,15 @@ namespace VorticeImGui
         {
             ImGui.Render();
 
-            var dc = DeviceContext;
-            dc.ClearRenderTargetView(RenderView, new Color4(0, 0, 0));
-            dc.OMSetRenderTargets(RenderView);
+            var dc = deviceContext;
+            dc.ClearRenderTargetView(renderView, new Color4(0, 0, 0));
+            dc.OMSetRenderTargets(renderView);
             dc.RSSetViewport(0, 0, Win32Window.Width, Win32Window.Height);
 
             imGuiRenderer.Render(ImGui.GetDrawData());
             DoRender();
 
-            SwapChain.Present(0, PresentFlags.None);
+            swapChain.Present(0, PresentFlags.None);
         }
 
         public virtual void DoRender() { }
