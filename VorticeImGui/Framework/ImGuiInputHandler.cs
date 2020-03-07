@@ -9,7 +9,16 @@ namespace VorticeImGui
 {
     class ImGuiInputHandler
     {
-        public static void InitKeyMap()
+        IntPtr hwnd;
+        ImGuiMouseCursor lastCursor;
+
+        public ImGuiInputHandler(IntPtr hwnd)
+        {
+            this.hwnd = hwnd;
+            InitKeyMap();
+        }
+
+        void InitKeyMap()
         {
             var io = ImGui.GetIO();
 
@@ -35,14 +44,6 @@ namespace VorticeImGui
             io.KeyMap[(int)ImGuiKey.X] = 'X';
             io.KeyMap[(int)ImGuiKey.Y] = 'Y';
             io.KeyMap[(int)ImGuiKey.Z] = 'Z';
-        }
-
-        Window window;
-        ImGuiMouseCursor lastCursor;
-
-        public ImGuiInputHandler(Window window)
-        {
-            this.window = window;
         }
 
         public void Update()
@@ -104,22 +105,22 @@ namespace VorticeImGui
             if (io.WantSetMousePos)
             {
                 var pos = new POINT((int)io.MousePos.X, (int)io.MousePos.Y);
-                ClientToScreen(window.Handle, ref pos);
+                ClientToScreen(hwnd, ref pos);
                 SetCursorPos(pos.X, pos.Y);
             }
 
             //io.MousePos = new System.Numerics.Vector2(-FLT_MAX, -FLT_MAX);
 
             var foregroundWindow = GetForegroundWindow();
-            if (foregroundWindow == window.Handle || IsChild(foregroundWindow, window.Handle))
+            if (foregroundWindow == hwnd || IsChild(foregroundWindow, hwnd))
             {
                 POINT pos;
-                if (GetCursorPos(out pos) && ScreenToClient(window.Handle, ref pos))
+                if (GetCursorPos(out pos) && ScreenToClient(hwnd, ref pos))
                     io.MousePos = new System.Numerics.Vector2(pos.X, pos.Y);
             }
         }
 
-        public bool ProcessMessage(IntPtr hwnd, WindowMessage msg, UIntPtr wParam, IntPtr lParam)
+        public bool ProcessMessage(WindowMessage msg, UIntPtr wParam, IntPtr lParam)
         {
             if (ImGui.GetCurrentContext() == IntPtr.Zero)
                 return false;
@@ -191,6 +192,5 @@ namespace VorticeImGui
         static int WHEEL_DELTA = 120;
         static int GET_WHEEL_DELTA_WPARAM(UIntPtr wParam) => Utils.Hiword((int)wParam);
         static int GET_XBUTTON_WPARAM(UIntPtr wParam) => Utils.Hiword((int)wParam);
-
     }
 }

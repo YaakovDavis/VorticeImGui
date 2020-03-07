@@ -1261,6 +1261,15 @@ namespace Vortice.Win32
         OEM_CLEAR = 0xFE
     }
 
+    public enum SizeMessage
+    {
+        SIZE_RESTORED = 0,
+        SIZE_MINIMIZED = 1,
+        SIZE_MAXIMIZED = 2, 
+        SIZE_MAXSHOW = 3,
+        SIZE_MAXHIDE = 4,
+    }
+
     public static class Utils
     {
         public static int Loword(int number) => number & 0x0000FFFF;
