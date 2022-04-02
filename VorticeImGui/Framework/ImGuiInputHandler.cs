@@ -1,7 +1,5 @@
 ﻿using ImGuiNET;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Vortice.Win32;
 using static Vortice.Win32.User32;
 
@@ -9,7 +7,7 @@ namespace VorticeImGui
 {
     class ImGuiInputHandler
     {
-        IntPtr hwnd;
+        readonly IntPtr hwnd;
         ImGuiMouseCursor lastCursor;
 
         public ImGuiInputHandler(IntPtr hwnd)
@@ -37,7 +35,6 @@ namespace VorticeImGui
             io.KeyMap[(int)ImGuiKey.Space] = (int)VK.SPACE;
             io.KeyMap[(int)ImGuiKey.Enter] = (int)VK.RETURN;
             io.KeyMap[(int)ImGuiKey.Escape] = (int)VK.ESCAPE;
-            io.KeyMap[(int)ImGuiKey.KeyPadEnter] = (int)VK.RETURN;
             io.KeyMap[(int)ImGuiKey.A] = 'A';
             io.KeyMap[(int)ImGuiKey.C] = 'C';
             io.KeyMap[(int)ImGuiKey.V] = 'V';
@@ -114,8 +111,7 @@ namespace VorticeImGui
             var foregroundWindow = GetForegroundWindow();
             if (foregroundWindow == hwnd || IsChild(foregroundWindow, hwnd))
             {
-                POINT pos;
-                if (GetCursorPos(out pos) && ScreenToClient(hwnd, ref pos))
+                if (GetCursorPos(out POINT pos) && ScreenToClient(hwnd, ref pos))
                     io.MousePos = new System.Numerics.Vector2(pos.X, pos.Y);
             }
         }
@@ -189,7 +185,7 @@ namespace VorticeImGui
             return false;
         }
 
-        static int WHEEL_DELTA = 120;
+        static readonly int WHEEL_DELTA = 120;
         static int GET_WHEEL_DELTA_WPARAM(UIntPtr wParam) => Utils.Hiword((int)wParam);
         static int GET_XBUTTON_WPARAM(UIntPtr wParam) => Utils.Hiword((int)wParam);
     }

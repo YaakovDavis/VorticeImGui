@@ -1,35 +1,28 @@
 ﻿using ImGuiNET;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
-using System.Text;
 using Vortice.Direct3D11;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 using Vortice.Win32;
-using VorticeImGui;
 
 namespace VorticeImGui
 {
     class AppWindow
     {
         public Win32Window Win32Window;
-
-        ID3D11Device device;
-        ID3D11DeviceContext deviceContext;
+        readonly ID3D11Device device;
+        readonly ID3D11DeviceContext deviceContext;
         IDXGISwapChain swapChain;
         ID3D11Texture2D backBuffer;
         ID3D11RenderTargetView renderView;
-
-        Format format = Format.R8G8B8A8_UNorm;
-
-        ImGuiRenderer imGuiRenderer;
-        ImGuiInputHandler imguiInputHandler;
-        Stopwatch stopwatch = Stopwatch.StartNew();
+        readonly Format format = Format.R8G8B8A8_UNorm;
+        readonly ImGuiRenderer imGuiRenderer;
+        readonly ImGuiInputHandler imguiInputHandler;
+        readonly Stopwatch stopwatch = Stopwatch.StartNew();
         TimeSpan lastFrameTime;
-
-        IntPtr imGuiContext;
+        readonly IntPtr imGuiContext;
 
         public AppWindow(Win32Window win32window, ID3D11Device device, ID3D11DeviceContext deviceContext)
         {
@@ -70,7 +63,7 @@ namespace VorticeImGui
                             Win32Window.Width = Utils.Loword(lp);
                             Win32Window.Height = Utils.Hiword(lp);
 
-                            resize();
+                            Resize();
                             break;
                         case SizeMessage.SIZE_MINIMIZED:
                             Win32Window.IsMinimized = true;
@@ -87,10 +80,10 @@ namespace VorticeImGui
         public void UpdateAndDraw()
         {
             UpdateImGui();
-            render();
+            Render();
         }
 
-        void resize()
+        void Resize()
         {
             if (renderView == null)//first show
             {
@@ -100,11 +93,11 @@ namespace VorticeImGui
                 {
                     BufferCount = 1,
                     BufferDescription = new ModeDescription(Win32Window.Width, Win32Window.Height, format),
-                    IsWindowed = true,
+                    Windowed = true,
                     OutputWindow = Win32Window.Handle,
                     SampleDescription = new SampleDescription(1, 0),
                     SwapEffect = SwapEffect.Discard,
-                    Usage = Vortice.DXGI.Usage.RenderTargetOutput
+                    BufferUsage = Usage.RenderTargetOutput,
                 };
 
                 swapChain = dxgiFactory.CreateSwapChain(device, swapchainDesc);
@@ -123,13 +116,14 @@ namespace VorticeImGui
                 backBuffer = swapChain.GetBuffer<ID3D11Texture2D1>(0);
                 renderView = device.CreateRenderTargetView(backBuffer);
             }
+
+            ImGui.GetIO().DisplaySize = new Vector2(Win32Window.Width, Win32Window.Height);
         }
 
         public virtual void UpdateImGui()
         {
             ImGui.SetCurrentContext(imGuiContext);
             var io = ImGui.GetIO();
-
             var now = stopwatch.Elapsed;
             var delta = now - lastFrameTime;
             lastFrameTime = now;
@@ -140,15 +134,13 @@ namespace VorticeImGui
             ImGui.NewFrame();
         }
 
-        void render()
+        void Render()
         {
             ImGui.Render();
 
             var dc = deviceContext;
-            dc.ClearRenderTargetView(renderView, new Color4(0, 0, 0));
             dc.OMSetRenderTargets(renderView);
-            dc.RSSetViewport(0, 0, Win32Window.Width, Win32Window.Height);
-
+            dc.ClearRenderTargetView(renderView, new Color4(0.45f, 0.55f, 0.60f, 1.00f));
             imGuiRenderer.Render(ImGui.GetDrawData());
             DoRender();
 
