@@ -2,7 +2,6 @@
 // Distributed under the MIT license. See the LICENSE file in the project root for more information.
 
 using System;
-using System.Diagnostics;
 using Vortice.Mathematics;
 using Vortice.Win32;
 using static Vortice.Win32.User32;
@@ -39,7 +38,7 @@ namespace VorticeImGui
 
             var hwnd = CreateWindowEx(
                 (int)styleEx, wndClass, Title, (int)style,
-                x, y, windowWidth, windowHeight,
+                x, y, (int)windowWidth, (int)windowHeight,
                 IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
 
             Handle = hwnd;

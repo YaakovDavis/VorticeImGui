@@ -10,10 +10,14 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="ImGui.NET" Version="1.75.0" />
-    <PackageReference Include="Vortice.D3DCompiler" Version="1.5.0" />
-    <PackageReference Include="Vortice.Direct3D11" Version="1.5.0" />
+    <PackageReference Include="ImGui.NET" Version="1.87.3" />
+    <PackageReference Include="Vortice.D3DCompiler" Version="2.1.5-beta" />
+    <PackageReference Include="Vortice.Direct3D11" Version="2.1.5-beta" />
   </ItemGroup>
 
 </Project>

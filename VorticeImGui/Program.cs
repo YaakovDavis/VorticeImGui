@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Vortice.Win32;
 using static Vortice.Win32.Kernel32;
 using static Vortice.Win32.User32;
@@ -39,8 +37,7 @@ namespace VorticeImGui
 
         ID3D11Device device;
         ID3D11DeviceContext deviceContext;
-
-        Dictionary<IntPtr, AppWindow> windows = new Dictionary<IntPtr, AppWindow>();
+        readonly Dictionary<IntPtr, AppWindow> windows = new Dictionary<IntPtr, AppWindow>();
 
         void Run()
         {
@@ -89,8 +86,7 @@ namespace VorticeImGui
 
         IntPtr WndProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam)
         {
-            AppWindow window;
-            windows.TryGetValue(hWnd, out window);
+            windows.TryGetValue(hWnd, out var window);
 
             if (window?.ProcessMessage(msg, wParam, lParam) ?? false)
                 return IntPtr.Zero;
